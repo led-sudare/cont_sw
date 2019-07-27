@@ -1,0 +1,16 @@
+###
+GET http://localhost:5003/api/hello
+
+
+###
+GET http://localhost:5003/api/status
+
+
+###
+POST http://localhost:5003/api/config
+content-type: application/json
+
+{
+    "enable": true
+}
+

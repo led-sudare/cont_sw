@@ -1,1 +1,7 @@
-﻿
+﻿.vscode/
+debug
+cont_sw.exe
+
+dockerbuild.sh
+dockerstart.sh
+Dockerfile
