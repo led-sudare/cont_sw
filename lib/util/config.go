@@ -7,10 +7,9 @@ import (
 )
 
 func ReadConfig(configs interface{}) error {
-	val, err := ioutil.ReadFile("./config.yml")
-
+	buf, err := ioutil.ReadFile("config.yml")
 	if err == nil {
-		err := yaml.Unmarshal(val, &configs)
+		err := yaml.Unmarshal(buf, configs)
 		if err != nil {
 			return err
 		}

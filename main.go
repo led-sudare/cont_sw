@@ -1,16 +1,14 @@
 package main
 
 import (
-	"io/ioutil"
+	"cont_sw/lib/util"
 	"net/http"
 
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"gopkg.in/yaml.v2"
 
 	echoLog "github.com/labstack/gommon/log"
 	"github.com/neko-neko/echo-logrus/v2/log"
@@ -25,7 +23,7 @@ type Configs struct {
 type Content struct {
 	Name   string `yaml:"name"`
 	Addr   string `yaml:"addr"`
-	Enable string `yaml:"enable`
+	Enable bool   `yaml:"enable`
 }
 
 func newConfig() Configs {
@@ -73,16 +71,10 @@ func main() {
 
 	log.Info("start")
 
-	var conf Configs
-	buf, err := ioutil.ReadFile("config.yml")
-	log.Info("read: ", string(buf))
+	conf := newConfig()
+	util.ReadConfig(&conf)
 
-	err = yaml.Unmarshal(buf, &conf)
-	if err != nil {
-		panic(err)
-	}
-	// util.ReadConfig(&conf)
-	log.Info("dump: ", fmt.Sprintf("%#v", conf))
+	// log.Info("dump: ", fmt.Sprintf("%#v", conf))
 
 	e := createEcho()
 	setLogger(e)
