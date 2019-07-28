@@ -14,23 +14,23 @@ import (
 	echoLog "github.com/labstack/gommon/log"
 	"github.com/neko-neko/echo-logrus/v2/log"
 	"github.com/sirupsen/logrus"
-	// log "github.com/cihub/seelog"
 )
 
-type configs struct {
+type Configs struct {
 	port string `json:"port"`
-
-	rsServer string `json:"rs_server"`
-	demos    string `json:"demos"`
-	iguchi   string `json:"iguchi"`
+	// contents []Content `json:"contents`
 }
 
-func newConfig() *configs {
-	return &configs{
-		port:     "8002",
-		rsServer: "localhost:5002",
-		demos:    "localhost:5003",
-		iguchi:   "localhost:5004",
+type Content struct {
+	name   string `json:"name"`
+	addr   string `json:"addr"`
+	enable bool   `json:"enable`
+}
+
+func newConfig() *Configs {
+	return &Configs{
+		port: "8002",
+		// contents: make([]Content, 0),
 	}
 }
 
@@ -72,7 +72,7 @@ func main() {
 
 	log.Info("start")
 	conf := newConfig()
-	util.ReadConfig(&conf)
+	util.ReadConfig(conf)
 	log.Info("dump: ", fmt.Sprintf("%#v", conf))
 
 	e := createEcho()

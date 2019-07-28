@@ -1,11 +1,21 @@
 {
-    "//web port": "port: 任意のポートを指定する",
-    "port": "8002",
+    "port": "9999",
 
-    "//comment": "rs_server address: 任意のIPとポートを指定する",
-    "rs_server": "localhost:5002",
-    "//comment": "demos address: 任意のIPとポートを指定する",
-    "demos": "localhost:5003",
-    "//comment": "iguchi address: 任意のIPとポートを指定する",
-    "iguchi": "localhost:5004"
+    "contents": [
+        {
+            "name": "rs_server",
+            "addr": "localhost:5002",
+            "enable": false
+        },
+        {
+            "name": "demos",
+            "addr": "localhost:5003",
+            "enable": false
+        },
+        {
+            "name": "iguchi", 
+            "addr": "localhost:5004",
+            "enable": false
+        }
+    ]
 }
