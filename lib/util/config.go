@@ -1,15 +1,16 @@
 package util
 
 import (
-	"encoding/json"
 	"io/ioutil"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 func ReadConfig(configs interface{}) error {
-	configsJSON, err := ioutil.ReadFile("./config.json")
+	val, err := ioutil.ReadFile("./config.yml")
 
 	if err == nil {
-		err := json.Unmarshal(configsJSON, &configs)
+		err := yaml.Unmarshal(val, &configs)
 		if err != nil {
 			return err
 		}

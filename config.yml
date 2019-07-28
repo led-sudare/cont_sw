@@ -1,0 +1,12 @@
+port: 8002
+
+contents:
+  - name: "rs_server"
+    addr: "localhost:5002"
+    enable: "false"
+  - name: "demos"
+    addr: "localhost:5003"
+    enable: "false"
+  - name: "iguchi"
+    addr: "localhost:5004"
+    enable: "false"

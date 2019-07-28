@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cont_sw/lib/util"
+	"io/ioutil"
 	"net/http"
 
 	"fmt"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"gopkg.in/yaml.v2"
 
 	echoLog "github.com/labstack/gommon/log"
 	"github.com/neko-neko/echo-logrus/v2/log"
@@ -17,20 +18,20 @@ import (
 )
 
 type Configs struct {
-	port string `json:"port"`
-	// contents []Content `json:"contents`
+	Port     string    `yaml:"port"`
+	Contents []Content `yaml:"contents`
 }
 
 type Content struct {
-	name   string `json:"name"`
-	addr   string `json:"addr"`
-	enable bool   `json:"enable`
+	Name   string `yaml:"name"`
+	Addr   string `yaml:"addr"`
+	Enable string `yaml:"enable`
 }
 
-func newConfig() *Configs {
-	return &Configs{
-		port: "8002",
-		// contents: make([]Content, 0),
+func newConfig() Configs {
+	return Configs{
+		Port:     "8080",
+		Contents: make([]Content, 0),
 	}
 }
 
@@ -71,14 +72,22 @@ func main() {
 	initLogger()
 
 	log.Info("start")
-	conf := newConfig()
-	util.ReadConfig(conf)
+
+	var conf Configs
+	buf, err := ioutil.ReadFile("config.yml")
+	log.Info("read: ", string(buf))
+
+	err = yaml.Unmarshal(buf, &conf)
+	if err != nil {
+		panic(err)
+	}
+	// util.ReadConfig(&conf)
 	log.Info("dump: ", fmt.Sprintf("%#v", conf))
 
 	e := createEcho()
 	setLogger(e)
 	setRouter(e)
-	startEcho(e, conf.port)
+	startEcho(e, conf.Port)
 
 	log.Info("done.")
 }
