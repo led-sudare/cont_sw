@@ -1,15 +1,18 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
-    "path"
-    "strconv"
+	"path"
+	"strings"
 
+	"github.com/neko-neko/echo-logrus/v2/log"
 	"github.com/pkg/errors"
 )
 
@@ -19,7 +22,8 @@ type Node struct {
 }
 
 func NewNode(addr string) (*Node, error) {
-	parsedURL, err := url.ParseRequestURI(addr)
+	_addr := addProtocols(addr)
+	parsedURL, err := url.ParseRequestURI(_addr)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse url: %s", addr)
 	}
@@ -31,16 +35,25 @@ func NewNode(addr string) (*Node, error) {
 	return n, nil
 }
 
+func addProtocols(addr string) string {
+	if strings.HasPrefix(addr, "http://") ||
+		strings.HasPrefix(addr, "https://") {
+		return addr
+	}
+	return "http://" + addr
+}
+
 func (node *Node) newRequest(ctx context.Context, method string, subPath string, body io.Reader) (*http.Request, error) {
 	endpointURL := *node.endpointURL
 	endpointURL.Path = path.Join(node.endpointURL.Path, subPath)
-
 	req, err := http.NewRequest(method, endpointURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
-	req = req.WithContext(ctx)
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
 	req.Header.Set("Content-Type", "application/json")
 	return req, nil
 }
@@ -72,21 +85,31 @@ func (node *Node) GetStatus(ctx context.Context) (*Status, error) {
 		return nil, err
 	}
 
+	log.Debug(stat)
 	return &stat, nil
 }
 
 func (node *Node) PostConfig(ctx context.Context, enable bool) error {
 	subPath := fmt.Sprintf("/api/config")
-	val := url.Values{}
-	val.Set("enable", strconv.FormatBool(enable))
-	req, err := node.newRequest(ctx, "POST", subPath, val)
+	val, _ := json.Marshal(Status{Enable: enable})
+	req, err := node.newRequest(ctx, "POST", subPath, bytes.NewBuffer(val))
 	if err != nil {
 		return err
 	}
 
+	dump1, _ := httputil.DumpRequestOut(req, true)
+
 	resp, err := node.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return err
+	}
+
+	dump2, _ := httputil.DumpResponse(resp, true)
+	log.Debug(string(dump1))
+	log.Debug(string(dump2))
+	if resp.StatusCode != 200 {
+		defer resp.Body.Close()
+		log.Debug(resp.Body)
 	}
 
 	return nil

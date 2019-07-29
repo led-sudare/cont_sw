@@ -1,9 +1,10 @@
 package main
 
 import (
+	"cont_sw/lib/api"
 	"cont_sw/lib/util"
-	"net/http"
 
+	"net/http"
 	"os"
 	"time"
 
@@ -23,7 +24,7 @@ type Configs struct {
 type Content struct {
 	Name   string `yaml:"name"`
 	Addr   string `yaml:"addr"`
-	Enable bool   `yaml:"enable`
+	Enable bool   `yaml:"enable"`
 }
 
 func newConfig() Configs {
@@ -31,6 +32,11 @@ func newConfig() Configs {
 		Port:     "8080",
 		Contents: make([]Content, 0),
 	}
+}
+
+type ContentNode struct {
+	prop   *Content
+	client *api.Node
 }
 
 func createEcho() *echo.Echo {
@@ -42,7 +48,7 @@ func createEcho() *echo.Echo {
 
 func initLogger() {
 	log.Logger().SetOutput(os.Stdout)
-	log.Logger().SetLevel(echoLog.INFO)
+	log.Logger().SetLevel(echoLog.DEBUG)
 	log.Logger().SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: time.RFC3339,
 	})
@@ -66,15 +72,50 @@ func setRouter(e *echo.Echo) {
 	})
 }
 
+func createNodes(conf *Configs) ([]ContentNode, error) {
+	nodes := make([]ContentNode, 0)
+	for _, content := range conf.Contents {
+		node, err := api.NewNode(content.Addr)
+		if err != nil {
+			return nil, err
+		}
+
+		nodes = append(nodes, ContentNode{
+			prop:   &content,
+			client: node,
+		})
+	}
+	return nodes, nil
+}
+
 func main() {
 	initLogger()
 
-	log.Info("start")
-
+	log.Info("start contents switch !!")
 	conf := newConfig()
-	util.ReadConfig(&conf)
+	err := util.ReadConfig(&conf)
+	if err != nil {
+		log.Errorf("read configs: %s", err)
+		os.Exit(-1)
+	}
 
-	// log.Info("dump: ", fmt.Sprintf("%#v", conf))
+	nodes, err := createNodes(&conf)
+	if err != nil {
+		log.Errorf("create nodes: %s", err)
+		os.Exit(-1)
+	}
+
+	err = nodes[0].client.PostConfig(nil, false)
+	if err != nil {
+		log.Errorf("response: %s", err)
+		os.Exit(-1)
+	}
+	stat, err := nodes[0].client.GetStatus(nil)
+	if err != nil {
+		log.Errorf("response: %s", err)
+		os.Exit(-1)
+	}
+	log.Infof("demos status: %#v", stat)
 
 	e := createEcho()
 	setLogger(e)

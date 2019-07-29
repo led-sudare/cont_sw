@@ -14,3 +14,11 @@ content-type: application/json
     "enable": true
 }
 
+###
+POST http://localhost:5003/api/config
+content-type: application/json
+
+{
+    "enable": false
+}
+
