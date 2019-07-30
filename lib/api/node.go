@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/neko-neko/echo-logrus/v2/log"
 	"github.com/pkg/errors"
@@ -21,7 +22,15 @@ type Node struct {
 	httpClient  *http.Client
 }
 
-func NewNode(addr string) (*Node, error) {
+type Option func(*http.Client)
+
+func Timeout(t int) Option {
+	return func(c *http.Client) {
+		c.Timeout = time.Duration(t) * time.Millisecond
+	}
+}
+
+func NewNode(addr string, options ...Option) (*Node, error) {
 	_addr := addProtocols(addr)
 	parsedURL, err := url.ParseRequestURI(_addr)
 	if err != nil {
@@ -31,6 +40,9 @@ func NewNode(addr string) (*Node, error) {
 	n := &Node{
 		endpointURL: parsedURL,
 		httpClient:  &http.Client{},
+	}
+	for _, option := range options {
+		option(n.httpClient)
 	}
 	return n, nil
 }
