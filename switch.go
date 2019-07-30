@@ -73,7 +73,7 @@ func createNodes(conf *Configs) ([]contentNode, error) {
 	return nodes, nil
 }
 
-func changeStateNode(node *contentNode, enable bool) error {
+func changeStateNode(node contentNode, enable bool) error {
 	// check alive & status
 	stat, err := node.client.GetStatus(nil)
 	if err != nil {
@@ -97,9 +97,9 @@ func changeStateNode(node *contentNode, enable bool) error {
 func (cs *contentSwitch) enableNodes(name string) error {
 	for _, node := range cs.nodes {
 		if node.prop.Name == name {
-			changeStateNode(&node, true)
+			go changeStateNode(node, true)
 		} else {
-			changeStateNode(&node, false)
+			go changeStateNode(node, false)
 		}
 	}
 	return nil
@@ -107,6 +107,6 @@ func (cs *contentSwitch) enableNodes(name string) error {
 
 func (cs *contentSwitch) disableNodes() {
 	for _, node := range cs.nodes {
-		changeStateNode(&node, false)
+		changeStateNode(node, false)
 	}
 }
