@@ -7,7 +7,7 @@ RUN apk add --no-cache \
     git
 
 ENV GO111MODULE=on
-EXPOSE 8003
+EXPOSE 8002
 WORKDIR /work/
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
