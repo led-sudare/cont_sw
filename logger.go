@@ -25,4 +25,3 @@ func setLogger(e *echo.Echo) {
 	e.Use(middleware.Logger())
 	log.Info("Logger enabled.")
 }
-

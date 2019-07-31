@@ -1,10 +1,41 @@
-###
-GET http://localhost:5003/api/hello
 
+curl
+############
+
+curl -v -X POST localhost:8002/api/enable?name=demos
+
+curl -v -X POST localhost:8002/api/alldisable
+
+curl -v localhost:8002/api/status?name=demos
+
+
+dont move
+curl -v -X POST -H "Content-Type: application/json" -d {\"enable\":true} localhost:8002/api/config?name=demos
+############
+
+cont_sw
+############
+GET http://localhost:8002/
+
+###
+GET http://localhost:8002/api/status?name=demos
+
+###
+GET http://localhost:8002/api/status?name=rs_server
+
+###
+POST http://localhost:8002/api/enable?name=demos
+
+###
+POST http://localhost:8002/api/alldisable
+
+
+Demos
+############
+GET http://localhost:5003/api/hello
 
 ###
 GET http://localhost:5003/api/status
-
 
 ###
 POST http://localhost:5003/api/config

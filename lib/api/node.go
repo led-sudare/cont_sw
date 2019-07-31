@@ -1,6 +1,8 @@
 package api
 
 import (
+	. "cont_sw/lib/model"
+
 	"bytes"
 	"context"
 	"encoding/json"
@@ -74,10 +76,6 @@ func decodeBody(resp *http.Response, out interface{}) error {
 	defer resp.Body.Close()
 	decoder := json.NewDecoder(resp.Body)
 	return decoder.Decode(out)
-}
-
-type Status struct {
-	Enable bool `json:"enable"`
 }
 
 func (node *Node) GetStatus(ctx context.Context) (*Status, error) {
