@@ -29,6 +29,9 @@ POST http://localhost:8002/api/enable?name=demos
 ###
 POST http://localhost:8002/api/alldisable
 
+###
+GET http://localhost:8002/api/list
+
 
 Demos
 ############

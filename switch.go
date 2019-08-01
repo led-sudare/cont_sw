@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/neko-neko/echo-logrus/v2/log"
 )
 
@@ -31,6 +32,7 @@ type (
 func createEcho(sw *contentSwitch) *echo.Echo {
 	e := echo.New()
 	e.HideBanner = true
+	e.Use(middleware.CORS())
 
 	setLogger(e)
 	setRouter(e, sw)
@@ -90,10 +92,15 @@ func setRouter(e *echo.Echo, sw *contentSwitch) {
 		sw.disableNodes()
 		return c.String(http.StatusOK, "changed all status: disable\n")
 	})
+
+	e.GET("/api/list", func(c echo.Context) error {
+		names := sw.getNames()
+		return c.JSON(http.StatusOK, names)
+	})
 }
 
 func createNodes(conf *Configs) ([]contentNode, error) {
-	nodes := make([]contentNode, 0)
+	var nodes []contentNode
 	for _, content := range conf.Contents {
 		node, err := api.NewNode(content.Addr, api.Timeout(conf.Timeout))
 		if err != nil {
@@ -158,6 +165,14 @@ func (cs *contentSwitch) getStatus(name string) (bool, error) {
 		}
 	}
 	return false, fmt.Errorf("node not founded.: %s\n", name)
+}
+
+func (cs *contentSwitch) getNames() []string {
+	var names []string
+	for _, node := range cs.nodes {
+		names = append(names, node.prop.Name)
+	}
+	return names
 }
 
 func StartContentSwitch(conf Configs) error {
