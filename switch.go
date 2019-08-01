@@ -12,14 +12,21 @@ import (
 	"github.com/neko-neko/echo-logrus/v2/log"
 )
 
-type contentSwitch struct {
-	nodes []contentNode
-}
+type (
+	contentSwitch struct {
+		nodes []contentNode
+	}
 
-type contentNode struct {
-	prop   Content
-	client *api.Node
-}
+	contentNode struct {
+		prop   Content
+		client *api.Node
+	}
+
+	statusAlive struct {
+		Enable bool `json:"enable"`
+		Alive  bool `json:"is_alive"`
+	}
+)
 
 func createEcho(sw *contentSwitch) *echo.Echo {
 	e := echo.New()
@@ -61,8 +68,9 @@ func setRouter(e *echo.Echo, sw *contentSwitch) {
 			return c.String(http.StatusBadRequest, err.Error())
 		}
 
-		var stat Status
+		var stat statusAlive
 		stat.Enable, err = sw.getStatus(name)
+		stat.Alive = err == nil
 		return c.JSON(http.StatusOK, stat)
 	})
 
