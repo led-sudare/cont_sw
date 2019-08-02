@@ -3,12 +3,12 @@ timeout: 3000
 
 contents:
   - name: "rs_server"
-    addr: "localhost:5002"
+    addr: "192.168.11.60:5002"
     enable: false
   - name: "demos"
-    addr: "localhost:5003"
+    addr: "192.168.11.30:5003"
     enable: false
   - name: "iguchi"
-    addr: "localhost:5004"
+    addr: "192.168.11.50:5004"
     enable: false
 
